@@ -31,7 +31,17 @@
         <td>
           <b>#{{ a.rank }}</b>
         </td>
-        <td>{{ a.name }}</td>
+        <td>
+          <router-link
+            class="hover:underline text-green-600"
+            v-bind:to="{ name: 'coin-detail', params: { id: a.id } }"
+          >
+            {{ a.name }}
+            <small class="ml-1 text-gray-500">
+              {{ a.symbol }}
+            </small>
+          </router-link>
+        </td>
         <td>{{ a.priceUsd | dollar }}</td>
         <td>{{ a.marketCapUsd | dollar }}</td>
         <td
