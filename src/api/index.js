@@ -18,8 +18,6 @@ function getAssetHistory(coin) {
   now.setDate(now.getDate() - 1);
   const start = now.getTime();
 
-  console.log(start, end);
-
   return fetch(
     `${url}/assets/${coin}/history?interval=h1&start=${start}&end=${end}`
   )
