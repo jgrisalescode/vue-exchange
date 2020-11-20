@@ -80,18 +80,51 @@
         "
         class="my-10"
       />
+      <h3>Best Exchange Offers</h3>
+      <table>
+        <tr
+          v-for="m in markets"
+          :key="`${m.exchangeId}-${m.priceUsd}`"
+          class="norder-b"
+        >
+          <td>
+            <b>{{ m.exchangeId }}</b>
+          </td>
+          <td>{{ m.priceUsd | dollar }}</td>
+          <td>{{ m.baseSymbol }} / {{ m.quoteSymbol }}</td>
+          <td>
+            <px-button
+              v-bind:is-loading="m.isLoading || false"
+              v-if="!m.url"
+              v-on:click="getWebSite(m)"
+            >
+              <slot>Get Link</slot>
+            </px-button>
+            <a
+              v-else
+              href=""
+              class="hover:underline text-green-600"
+              target="_blank"
+              >{{ m.url }}</a
+            >
+          </td>
+        </tr>
+      </table>
     </template>
   </div>
 </template>
 <script>
 import api from "@/api/index.js";
+import PxButton from "../components/PxButton.vue";
 export default {
+  components: { PxButton },
   name: "CoinDetail",
   data() {
     return {
       asset: {},
       history: [],
-      isLoading: false
+      isLoading: false,
+      markets: []
     };
   },
 
@@ -120,14 +153,35 @@ export default {
   },
 
   methods: {
+    getWebSite(exchange) {
+      return api
+        .getExchange(exchange.exchangeId)
+        .then(res => {
+          this.$set(exchange, "isLoading", true);
+          // exchange.url = res.exchangeUrl;
+          /*
+        Wen we click on button Vue does not detect the change, so solve with
+        Form the beginin the object market does not have a prop url, then wen we
+        click on button, the prop has been created inside object, but Vue does not detect
+        the change, we have to solve it with this below
+        */
+          this.$set(exchange, "url", res.exchangeUrl);
+        })
+        .finally(() => this.$set(exchange, "isLoading", false));
+    },
     getCoin() {
       // get the parameter setted in router for this route
       const id = this.$route.params.id;
       this.isLoading = true;
-      Promise.all([api.getAsset(id), api.getAssetHistory(id)])
-        .then(([asset, history]) => {
+      Promise.all([
+        api.getAsset(id),
+        api.getAssetHistory(id),
+        api.getMarkets(id)
+      ])
+        .then(([asset, history, markets]) => {
           this.asset = asset;
           this.history = history;
+          this.markets = markets;
         })
         .finally(() => (this.isLoading = false));
     }
