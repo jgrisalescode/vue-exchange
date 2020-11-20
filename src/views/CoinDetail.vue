@@ -102,7 +102,7 @@
             </px-button>
             <a
               v-else
-              href=""
+              v-bind:href="m.url"
               class="hover:underline text-green-600"
               target="_blank"
               >{{ m.url }}</a

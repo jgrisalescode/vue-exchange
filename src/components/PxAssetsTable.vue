@@ -3,19 +3,32 @@
     <thead>
       <tr class="bg-gray-100 border-b-2 border-gray-400">
         <th></th>
-        <th>
-          <span>Ranking</span>
+        <th
+          v-bind:class="{ up: this.sortOrder == 1, down: this.sortOrder == -1 }"
+        >
+          <span v-on:click="changeSortOrder" class="underline cursor-pointer"
+            >Ranking</span
+          >
         </th>
         <th>Name</th>
         <th>Price</th>
         <th>Market capital</th>
         <th>Variation 24hs</th>
-        <td class="hidden sm:block"></td>
+        <td class="hidden sm:block">
+          <input
+            type="text"
+            name=""
+            id="filter"
+            placeholder="Search..."
+            v-model="filter"
+            class="bg-gray-100 focus:online-none border-b border-gray-400 py-2 px-4 block w-full appearance-none leading-normal"
+          />
+        </td>
       </tr>
     </thead>
     <tbody>
       <tr
-        v-for="a in assets"
+        v-for="a in filteredAssets"
         v-bind:key="a.id"
         class="border-b border-gray-200 hover:bg-gray-100 hover:bg-orange-100"
       >
@@ -69,16 +82,44 @@ export default {
   components: {
     PxButton
   },
+  data() {
+    return {
+      filter: "",
+      sortOrder: 1
+    };
+  },
   props: {
     assets: {
       type: Array,
       defaul: () => []
     }
   },
+  computed: {
+    filteredAssets() {
+      const altOrder = this.sortOrder == 1 ? -1 : 1;
+
+      return this.assets
+        .filter(
+          asset =>
+            asset.symbol.toLowerCase().includes(this.filter.toLowerCase()) ||
+            asset.name.toLowerCase().includes(this.filter.toLowerCase())
+        )
+        .sort((a, b) => {
+          if (parseInt(a.rank) > parseInt(b.rank)) {
+            return this.sortOrder;
+          }
+
+          return altOrder;
+        });
+    }
+  },
   methods: {
     goToCoin(id) {
       // Access to an instance of router this.$router
       this.$router.push({ name: "coin-detail", params: { id } });
+    },
+    changeSortOrder() {
+      this.sortOrder = this.sortOrder == 1 ? -1 : 1;
     }
   }
 };
