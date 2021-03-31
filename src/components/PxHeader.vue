@@ -7,7 +7,7 @@
           <router-link
             v-bind:to="{ name: 'home' }"
             class="font-semibold text-xl tracking-tight"
-            >fresh.solutions - Exchange</router-link
+            >Julian Grisales - Exchange</router-link
           >
         </div>
         <div
